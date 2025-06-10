@@ -142,10 +142,11 @@ with tab1:
         input_df_named = pd.DataFrame(input_transformed, columns=feature_names)
 
         explainer = shap.Explainer(final_model, X_df_named)
-        shap_values = explainer(input_df_named)
+        shap_values = explainer(input_df_named,check_additivity=False)
 
         fig, ax = plt.subplots(figsize=(10, 6))
-        shap.plots.waterfall(shap_values[0], show=False)
+        shap.plots.waterfall(shap_values[0], show=False, max_display=10)
+
         st.pyplot(fig)
 
 # ========== Tab 2 ==========
@@ -193,7 +194,7 @@ with tab2:
     X_df_named = pd.DataFrame(X_transformed, columns=feature_names)
 
     explainer = shap.Explainer(final_model, X_df_named)
-    shap_values = explainer(X_df_named)
+    shap_values = explainer(X_df_named,check_additivity=False)
 
     fig, ax = plt.subplots(figsize=(12, 6))
     shap.summary_plot(shap_values, X_df_named, plot_type="bar", show=False)
