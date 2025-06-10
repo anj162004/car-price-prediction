@@ -1,9 +1,8 @@
 streamlit
+streamlit_toggle
 pandas
-numpy
-seaborn
 matplotlib
-shap
-joblib
+seaborn
 scikit-learn
-streamlit-toggle
+joblib
+shap
