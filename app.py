@@ -1,28 +1,22 @@
 import streamlit as st
-from streamlit_toggle import st_toggle_switch
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 import joblib
-import time
+import seaborn as sns
+import matplotlib.pyplot as plt
+import matplotlib as mpl
 import shap
-st.set_page_config(page_title="Car Price App", page_icon="🚗")
+import time
 
+# ========== Theme Settings ==========
+bg_color = "#FFFFFF"
+font_color = "#000000"
+gradient = "linear-gradient(to right, #8e9eab, #eef2f3)"
 
-# ========== Theme Toggle ==========
-theme_toggle = st_toggle_switch('🌓 Toggle Theme', label_after=True, default_value=False)
+# ========== Reset Matplotlib/Seaborn Style ==========
+mpl.rcParams.update(mpl.rcParamsDefault)
+sns.set_style("whitegrid")
 
-# ========== Apply Theme Based on Toggle ==========
-if theme_toggle:
-    bg_color = "#121212"
-    font_color = "#f1f1f1"
-    gradient = "linear-gradient(90deg, #333333, #666666)"
-else:
-    bg_color = "#E3F2FD"
-    font_color = "#2E3A59"
-    gradient = "linear-gradient(90deg, #D1C4E9, #B39DDB)"
-
-# ========== Inject CSS and JS ==========
+# ========== Custom CSS ==========
 st.markdown(f"""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap');
@@ -34,8 +28,6 @@ st.markdown(f"""
         color: {font_color} !important;
         font-family: 'Quicksand', sans-serif;
     }}
-    
-
     .heading-box {{
         background: {gradient};
         color: #ffffff;
@@ -48,40 +40,20 @@ st.markdown(f"""
         margin-bottom: 30px;
         letter-spacing: 1px;
     }}
-    .theme-float-box {{
-        position: fixed;
-        top: 10px;
-        right: 20px;
-        z-index: 9999;
-        background-color: white;
-        padding: 5px 12px;
-        border-radius: 8px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        font-size: 14px;
-        width: 160px;
-    }}
     </style>
-    <div class="theme-float-box" id="theme-container"></div>
-    <script>
-    const container = window.parent.document.querySelector("#theme-container");
-    const widget = window.parent.document.querySelectorAll('[data-baseweb="select"]')[0];
-    if (container && widget && !container.contains(widget)) {{
-        container.appendChild(widget);
-    }}
-    </script>
 """, unsafe_allow_html=True)
 
 # ========== Load Model and Data ==========
 model = joblib.load('best_car_price_model.pkl')
 df = pd.read_csv('car data.csv')
 
-# ========== Heading ==========
+# ========== App Title ==========
 st.markdown('<div class="heading-box">🚗 Car Price Prediction App</div>', unsafe_allow_html=True)
 
 # ========== Tabs ==========
 tab1, tab2 = st.tabs(["🚘 Predict Price", "📊 Dashboard"])
 
-# ========== Tab 1 ==========
+# ========== Tab 1: Prediction ==========
 with tab1:
     st.subheader("Enter car details")
 
@@ -122,7 +94,7 @@ with tab1:
             st.success(f"Predicted Selling Price: ₹{prediction[0]:.2f} Lakhs")
             st.toast("Prediction successful!", icon="🎉")
 
-        # SHAP Explanation
+        # SHAP Waterfall Plot
         st.subheader("🔍 Why this Prediction?")
         preprocessor = model.named_steps['preprocessor']
         final_model = model.named_steps['model']
@@ -136,20 +108,20 @@ with tab1:
         if hasattr(input_transformed, "toarray"):
             input_transformed = input_transformed.toarray()
 
-        # Clean feature names
         feature_names = [name.split('__')[-1].replace('_', ' ') for name in preprocessor.get_feature_names_out()]
         X_df_named = pd.DataFrame(X_transformed, columns=feature_names)
         input_df_named = pd.DataFrame(input_transformed, columns=feature_names)
 
         explainer = shap.Explainer(final_model, X_df_named)
-        shap_values = explainer(input_df_named,check_additivity=False)
+        shap_values = explainer(input_df_named, check_additivity=False)
 
         fig, ax = plt.subplots(figsize=(10, 6))
-        shap.plots.waterfall(shap_values[0], show=False, max_display=10)
-
+        shap.plots.waterfall(shap_values[0], show=False)
         st.pyplot(fig)
+# ========== Load Model and Data ==========
 
-# ========== Tab 2 ==========
+
+# ========== Tab 2: Dashboard ==========
 with tab2:
     st.header("📈 Car Dataset Dashboard")
     st.subheader("🔍 Sample Data")
@@ -179,22 +151,24 @@ with tab2:
     sns.heatmap(corr, annot=True, cmap="coolwarm", ax=ax)
     st.pyplot(fig)
 
-    # SHAP Summary Plot
     st.subheader("🧠 SHAP Summary Plot (Feature Impact Overview)")
+    
     preprocessor = model.named_steps['preprocessor']
     final_model = model.named_steps['model']
-
     shap_df = df.drop("Selling Price", axis=1, errors="ignore")
-
-
     X_transformed = preprocessor.transform(shap_df)
     if hasattr(X_transformed, "toarray"):
         X_transformed = X_transformed.toarray()
+
+# ✅ Define feature_names here again
     feature_names = [name.split('__')[-1].replace('_', ' ') for name in preprocessor.get_feature_names_out()]
+
     X_df_named = pd.DataFrame(X_transformed, columns=feature_names)
 
+
+
     explainer = shap.Explainer(final_model, X_df_named)
-    shap_values = explainer(X_df_named,check_additivity=False)
+    shap_values = explainer(X_df_named, check_additivity=False)
 
     fig, ax = plt.subplots(figsize=(12, 6))
     shap.summary_plot(shap_values, X_df_named, plot_type="bar", show=False)
