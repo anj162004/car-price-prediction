@@ -11,17 +11,51 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from streamlit.components.v1 import components
+# ========== Theme Settings ==========
+bg_color = "#FFFFFF"
+font_color = "#000000"
+
+# ========== Custom CSS ==========
+st.markdown(f"""
+    <style>
+    button[data-baseweb="tab"] span {{
+        color: #000 !important;
+        font-weight: 600 !important;
+        font-size: 16px !important;
+    }}
+    </style>
+""", unsafe_allow_html=True)
 
 # ========== Global Styling ==========
+# Fix label visibility in dark mode
 st.markdown("""
-    <style>
+<style>
+label[data-testid="stCheckboxLabel"] {
+    color: #000 !important;      /* Use #fff for white if using dark background */
+    font-weight: 600 !important;
+    font-size: 16px !important;
+    display: block;
+    margin-bottom: 10px;
+}
+</style>
+""", unsafe_allow_html=True)
+st.markdown("""
+<style>
+div.row-widget.stCheckbox {
+    padding: 6px 0;
+}
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+     <style>
     html, body, [class*="css"] {
         background-color: white !important;
-        color: black !important;
+        /* REMOVE this: color: black !important; */
     }
     .form-label {
         font-weight: bold;
-        color: black !important;
+        color: #333333 !important;  /* Now this will work */
         margin-bottom: 4px;
         display: block;
     }
@@ -136,33 +170,46 @@ with tab3:
 # ========== Tab: Predict Price ==========
 with tab1:
     st.markdown("<h3 style='color:black; font-weight:bold;'>📝 Car Details Form</h3>", unsafe_allow_html=True)
+    st.markdown("""
+    <div style='
+        background: linear-gradient(to right, #fceabb, #f8b500);
+        padding: 25px;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        margin-bottom: 25px;
+    '>
+""", unsafe_allow_html=True)
 
     with st.form("car_form"):
-        st.markdown('<label class="form-label">📅 Year</label>', unsafe_allow_html=True)
-        year = st.number_input("", min_value=1990, max_value=2025, value=2015)
 
-        st.markdown('<label class="form-label">💰 Present Price (in Lakhs)</label>', unsafe_allow_html=True)
-        present_price = st.number_input("", min_value=0.0, value=5.0)
+        st.markdown('<span style="font-weight:bold; color:#1f77b4;">📅 Year</span>', unsafe_allow_html=True)
+        year = st.number_input(" ", min_value=1990, max_value=2025, value=2015)
 
-        st.markdown('<label class="form-label">🛣️ Kms Driven</label>', unsafe_allow_html=True)
-        kms = st.number_input("", min_value=0, value=50000)
+        st.markdown('<span style="font-weight:bold; color:#e67e22;">💰 Present Price (in Lakhs)</span>', unsafe_allow_html=True)
+        present_price = st.number_input("  ", min_value=0.0, value=5.0)
 
-        st.markdown('<label class="form-label">👤 Owner Count</label>', unsafe_allow_html=True)
-        owner = st.selectbox("", ["0", "1", "2", "3"])
+        st.markdown('<span style="font-weight:bold; color:#27ae60;">🛣️ Kms Driven</span>', unsafe_allow_html=True)
+        kms = st.number_input("   ", min_value=0, value=50000)
 
-        st.markdown('<label class="form-label">⛽ Fuel Type</label>', unsafe_allow_html=True)
-        fuel = st.selectbox("", ["Petrol", "Diesel", "CNG", "LPG", "Electric"])
+        st.markdown('<span style="font-weight:bold; color:#9b59b6;">👤 Owner Count</span>', unsafe_allow_html=True)
+        owner = st.selectbox("    ", ["0", "1", "2", "3"])
 
-        st.markdown('<label class="form-label">🏪 Seller Type</label>', unsafe_allow_html=True)
-        seller = st.selectbox("", ["Dealer", "Individual", "Trustmark Dealer"])
+        st.markdown('<span style="font-weight:bold; color:#e74c3c;">⛽ Fuel Type</span>', unsafe_allow_html=True)
+        fuel = st.selectbox("     ", ["Petrol", "Diesel", "CNG", "LPG", "Electric"])
 
-        st.markdown('<label class="form-label">⚙️ Transmission</label>', unsafe_allow_html=True)
-        transmission = st.selectbox("", ["Manual", "Automatic"])
+        st.markdown('<span style="font-weight:bold; color:#2980b9;">🏪 Seller Type</span>', unsafe_allow_html=True)
+        seller = st.selectbox("      ", ["Dealer", "Individual", "Trustmark Dealer"])
 
-        st.markdown('<label class="form-label">🚗 Car Name</label>', unsafe_allow_html=True)
-        car_name = st.text_input("", "Maruti Swift")
+        st.markdown('<span style="font-weight:bold; color:#16a085;">⚙️ Transmission</span>', unsafe_allow_html=True)
+        transmission = st.selectbox("       ", ["Manual", "Automatic"])
+
+        st.markdown('<span style="font-weight:bold; color:#d35400;">🚗 Car Name</span>', unsafe_allow_html=True)
+        car_name = st.text_input("        ", "Maruti Swift")
 
         submitted = st.form_submit_button("Predict Price")
+        st.markdown("</div>", unsafe_allow_html=True)
+
+
 
         if submitted:
             input_df = pd.DataFrame([{
@@ -210,6 +257,20 @@ with tab1:
 with tab2:
     st.markdown("<h2 style='color:black !important;'>📊 Dashboard</h2>", unsafe_allow_html=True)
     st.markdown("Explore the dataset used to train the model.")
+    st.markdown("""
+<div style='background-color: #f9f9f9; padding: 12px 20px; border-left: 5px solid #4a90e2; border-radius: 6px;'>
+<h4 style='color:black;'>📊 Feature Visualization</h4>
+<p style='color:black; font-size: 15px;'>
+Choose a feature from the dropdown to see its distribution:
+<ul>
+<li><b>Categorical Features</b> (like Fuel Type or Seller Type) show frequency using a bar chart.</li>
+<li><b>Numerical Features</b> (like Year or Present Price) show distribution using a histogram and smooth density curve.</li>
+</ul>
+This helps you understand data trends and variability in your dataset.
+</p>
+</div>
+""", unsafe_allow_html=True)
+
 
     selected_col = st.selectbox("Select a feature to visualize", df.columns)
 
