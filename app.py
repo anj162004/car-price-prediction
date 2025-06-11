@@ -13,6 +13,8 @@ from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
 from streamlit.components.v1 import components
 
+
+
 def st_shap(plot, height=None):
     """Use only for JavaScript-based SHAP plots like force_plot"""
     if hasattr(plot, "html"):
@@ -119,7 +121,9 @@ tab3, tab1, tab2 = st.tabs(["ℹ️ About the App", "🚘 Predict Price", "📊 
 
 # ========== Tab 3 ==========
 with tab3:
-    st.header("ℹ️ About This App")
+    st.markdown("<h3 style='color:black;'>ℹ️ About This App</h3>", unsafe_allow_html=True)
+
+   
     st.markdown("""
     This app predicts the selling price of used cars using a trained ML model.
     - Input car details
@@ -133,17 +137,36 @@ with tab3:
         st.warning(f"Banner image not found at: {banner_path}")
 
 # ========== Tab 1: Prediction ==========
-with tab1:
-    with st.form("input_form"):
-        year = st.number_input("📅 Year", min_value=1990, max_value=2025, value=2015)
-        present_price = st.number_input("💰 Present Price (in Lakhs)", min_value=0.0, value=5.0)
-        kms = st.number_input("🛣️ Kms Driven", min_value=0, value=50000)
-        owner = st.selectbox("👤 Owner Count", ["0", "1", "2", "3"])
-        fuel = st.selectbox("⛽ Fuel Type", ["Petrol", "Diesel", "CNG", "LPG", "Electric"])
-        seller = st.selectbox("🏪 Seller Type", ["Dealer", "Individual", "Trustmark Dealer"])
-        transmission = st.selectbox("⚙️ Transmission", ["Manual", "Automatic"])
-        car_name = st.text_input("🚗 Car Name", "Maruti Swift")
-        submitted = st.form_submit_button("🧮 Predict Price")
+st.markdown("<h3 style='color:black; font-weight:bold;'>📝 Car Details Form</h3>", unsafe_allow_html=True)
+
+with st.form("car_form"):
+
+    st.markdown('<p style="color:black; font-weight:bold;">📅 Year</p>', unsafe_allow_html=True)
+    year = st.number_input("", min_value=1990, max_value=2025, value=2015)
+
+    st.markdown('<p style="color:black; font-weight:bold;">💰 Present Price (in Lakhs)</p>', unsafe_allow_html=True)
+    present_price = st.number_input("", min_value=0.0, value=5.0)
+
+    st.markdown('<p style="color:black; font-weight:bold;">🛣️ Kms Driven</p>', unsafe_allow_html=True)
+    kms = st.number_input("", min_value=0, value=50000)
+
+    st.markdown('<p style="color:blue; font-weight:bold;">👤 Owner Count</p>', unsafe_allow_html=True)
+    owner = st.selectbox("", ["0", "1", "2", "3"])
+
+    st.markdown('<p style="color:green; font-weight:bold;">⛽ Fuel Type</p>', unsafe_allow_html=True)
+    fuel = st.selectbox("", ["Petrol", "Diesel", "CNG", "LPG", "Electric"])
+
+    st.markdown('<p style="color:purple; font-weight:bold;">🏪 Seller Type</p>', unsafe_allow_html=True)
+    seller = st.selectbox("", ["Dealer", "Individual", "Trustmark Dealer"])
+
+    st.markdown('<p style="color:darkred; font-weight:bold;">⚙️ Transmission</p>', unsafe_allow_html=True)
+    transmission = st.selectbox("", ["Manual", "Automatic"])
+
+    st.markdown('<p style="color:black; font-weight:bold;">🚗 Car Name</p>', unsafe_allow_html=True)
+    car_name = st.text_input("", "Maruti Swift")
+
+    submitted = st.form_submit_button("🧮 Predict Price")
+
 
     if submitted:
         input_df = pd.DataFrame([{
@@ -196,7 +219,8 @@ This lets you see how much each input feature (like Present Price, Fuel Type, Ye
 
 # ========== Tab 2: Dashboard ==========
 with tab2:
-    st.header("📊 Dashboard")
+    st.markdown("<h2 style='color:black;'>📊 Dashboard</h2>", unsafe_allow_html=True)
+
     st.markdown("Explore the dataset used to train the model.")
     
 
