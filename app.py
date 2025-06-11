@@ -223,18 +223,30 @@ with tab2:
         sns.histplot(df[selected_col], kde=True, color='skyblue')
         st.pyplot(fig)
 
-    # ⬇️ Apply styling just once and early
+    # Style checkbox labels globally for better mobile visibility
+    # Force checkbox label to be bold and visible across all devices
     st.markdown("""
-        <style>
-        label[data-testid="stCheckboxLabel"] {
-            color: black !important;
-            font-weight: 700 !important;
-            font-size: 17px !important;
-            padding: 6px 0;
-            display: block;
+    <style>
+    /* Force all checkbox labels to be visible and bold */
+    [data-testid="stCheckbox"] label, label[data-testid="stCheckboxLabel"] {
+        font-weight: 800 !important;
+        font-size: 18px !important;
+        color: #000000 !important;
+        display: block !important;
+        line-height: 1.8 !important;
+        white-space: normal !important;
+    }
+
+    /* Make sure container spacing is clean on mobile */
+    @media screen and (max-width: 768px) {
+        [data-testid="stCheckbox"] {
+            margin-bottom: 12px !important;
         }
-        </style>
-    """, unsafe_allow_html=True)
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+
 
     if st.checkbox("Show Correlation Heatmap"):
         st.subheader("📌 Feature Correlation")
@@ -242,6 +254,21 @@ with tab2:
         fig = plt.figure(figsize=(12, 8))
         sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f")
         st.pyplot(fig)
+        st.markdown("""
+<div style='background-color: #f9f9f9; padding: 12px 20px; border-left: 5px solid #2a9df4; border-radius: 6px;'>
+<h4 style='color:black;'>📌 What is a Feature Correlation Heatmap?</h4>
+<p style='color:black; font-size: 15px;'>
+This heatmap shows the strength of relationships between numerical features using correlation values:
+<ul>
+<li><b>+1</b>: Perfect positive correlation – both features increase together.</li>
+<li><b>-1</b>: Perfect negative correlation – one increases as the other decreases.</li>
+<li><b>0</b>: No correlation.</li>
+</ul>
+This helps identify related features and potential redundancies.
+</p>
+</div>
+""", unsafe_allow_html=True)
+
 
     if st.checkbox("Show SHAP Summary Plot"):
         st.subheader("🔍 SHAP Summary Plot (Global Feature Importance)")
@@ -249,3 +276,17 @@ with tab2:
         plt.figure()
         shap.summary_plot(shap_values_all.values, X_df_named)
         st.pyplot(plt.gcf())
+        st.markdown("""
+<div style='background-color: #f9f9f9; padding: 12px 20px; border-left: 5px solid #f77b00; border-radius: 6px;'>
+<h4 style='color:black;'>🔍 What is a SHAP Summary Plot?</h4>
+<p style='color:black; font-size: 15px;'>
+This plot explains the model's predictions across the dataset:
+<ul>
+<li><b>Y-axis:</b> Features ranked by overall importance.</li>
+<li><b>Color:</b> Red = high feature value, Blue = low value.</li>
+<li><b>X-axis:</b> Direction of impact – right increases prediction, left decreases it.</li>
+</ul>
+It gives a global view of how each feature contributes to model decisions.
+</p>
+</div>
+""", unsafe_allow_html=True)
